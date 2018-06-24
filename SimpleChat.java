@@ -3,6 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class SimpleChat extends Frame {
 
     private DataOutputStream osDataStream = null; // 네트워크 전송
 
-    public TextArea ReceiveDataField;     // 수신 데이터 표시
+    public JTextArea ReceiveDataField;     // 수신 데이터 표시
     public TextField SendDataField;        // 전송 데이터 입력
 
     // 프로그램 시작
@@ -64,13 +65,16 @@ public class SimpleChat extends Frame {
         setLayout(new BorderLayout());
 
         // 받은 데이터 표시 필드 생성
-        ReceiveDataField = new TextArea();
+        ReceiveDataField = new JTextArea();
         ReceiveDataField.setEditable(false);
         this.add(ReceiveDataField, BorderLayout.CENTER);
+        ReceiveDataField.setBackground(new Color(192, 207, 217));
 
         // 전송 데이터 입력 필드 생성
         SendDataField = new TextField();
+        SendDataField.setSize(350, 100);
         this.add(SendDataField, BorderLayout.SOUTH);
+        SendDataField.setSize(350, 100);
 
         // 전송 데이터 입력 필드에서 Enter키를 눌렸을때 이벤트 처리
         SendDataField.addActionListener(new TextActionHandler());
@@ -157,7 +161,7 @@ public class SimpleChat extends Frame {
             // 데이터를 네트워크 전송 통로를 통해 상대방으로전송
             try {
                 osDataStream.writeUTF(SendDataField.getText()); // 데이터를 전송한다.
-                ReceiveDataField.append("나 : " + SendDataField.getText() + "\n");
+                ReceiveDataField.append("                                                   " + SendDataField.getText() + "\n" + "\n"); // 전송한 데이터를 내 창에 띄운다. 
                 SendDataField.setText("");                // 기존의 입력한 데이터를 지운다.
             } catch (IOException x) {
                 setTitle(" # 에러 : " + x.getMessage());
@@ -167,7 +171,7 @@ public class SimpleChat extends Frame {
 
     // 수신 쓰레드에서 데이터를 받으면 TextArea에 데이터를 누적 시킴
     public void addRecvString(String str) {
-        ReceiveDataField.append(str + "\n");
+        ReceiveDataField.append(str + "\n" + "\n");
     }
 
     protected void finalize() throws Throwable {
@@ -205,7 +209,7 @@ class ReceiveDataThread extends Thread {
             // 반복
             while (bWaitting) {
                 str = isDataStream.readUTF(); // 만을 수신 데이터가 있다면
-                chat.addRecvString("상대방 : " + str);      // 수신 데이터 필드에 추가
+                chat.addRecvString(str);      // 수신 데이터 필드에 추가
             }
         } catch (IOException e) {
             chat.setTitle(" # 에러 : " + e.getMessage());
