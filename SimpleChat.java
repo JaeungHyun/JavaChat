@@ -29,7 +29,10 @@ public class SimpleChat extends Frame {
     private DataOutputStream osDataStream = null; // 네트워크 전송
 
     public JTextArea ReceiveDataField;     // 수신 데이터 표시
-    public TextField SendDataField;        // 전송 데이터 입력
+    public JTextField SendDataField;        // 전송 데이터 입력
+    public JScrollPane scrollPane;
+    
+
 
     // 프로그램 시작
     public static void main(String args[]) {
@@ -67,14 +70,19 @@ public class SimpleChat extends Frame {
         // 받은 데이터 표시 필드 생성
         ReceiveDataField = new JTextArea();
         ReceiveDataField.setEditable(false);
-        this.add(ReceiveDataField, BorderLayout.CENTER);
+        
+        // 스크롤바 구현
+        scrollPane = new JScrollPane(ReceiveDataField);
+        
+        this.add(scrollPane, BorderLayout.CENTER);
         ReceiveDataField.setBackground(new Color(192, 207, 217));
+        
+        
 
         // 전송 데이터 입력 필드 생성
-        SendDataField = new TextField();
-        SendDataField.setSize(350, 100);
+        SendDataField = new JTextField();
         this.add(SendDataField, BorderLayout.SOUTH);
-        SendDataField.setSize(350, 100);
+   
 
         // 전송 데이터 입력 필드에서 Enter키를 눌렸을때 이벤트 처리
         SendDataField.addActionListener(new TextActionHandler());
@@ -161,7 +169,8 @@ public class SimpleChat extends Frame {
             // 데이터를 네트워크 전송 통로를 통해 상대방으로전송
             try {
                 osDataStream.writeUTF(SendDataField.getText()); // 데이터를 전송한다.
-                ReceiveDataField.append("                                                   " + SendDataField.getText() + "\n" + "\n"); // 전송한 데이터를 내 창에 띄운다. 
+                ReceiveDataField.append("                                                   " + SendDataField.getText() + "\n" + "\n"); // 전송한 데이터를 내 창에 띄운다.
+                ReceiveDataField.setCaretPosition(ReceiveDataField.getDocument().getLength()); // 자동스크롤 추가 
                 SendDataField.setText("");                // 기존의 입력한 데이터를 지운다.
             } catch (IOException x) {
                 setTitle(" # 에러 : " + x.getMessage());
@@ -171,7 +180,8 @@ public class SimpleChat extends Frame {
 
     // 수신 쓰레드에서 데이터를 받으면 TextArea에 데이터를 누적 시킴
     public void addRecvString(String str) {
-        ReceiveDataField.append(str + "\n" + "\n");
+        ReceiveDataField.append(" " + str + "\n" + "\n");
+        ReceiveDataField.setCaretPosition(ReceiveDataField.getDocument().getLength()); // 자동스크롤 추가
     }
 
     protected void finalize() throws Throwable {
